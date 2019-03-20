@@ -5,3 +5,5 @@ function test() {
     x.info('ett info med meddelande %s', 'nisse');
     x.verbose('ett verbose med meddelande %s', 'nisse');
 }
+
+
