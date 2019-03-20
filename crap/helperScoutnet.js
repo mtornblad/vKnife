@@ -45,7 +45,7 @@ var ScoutnetHelper = function(conf) {
   
 
   //
-  // Internal functio
+  // Internal function
   //
   function parseUsers(members, lists) {
     var users = {};
