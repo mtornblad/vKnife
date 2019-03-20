@@ -30,9 +30,9 @@ class Log {
     this.log(LogLevel.Verbose, 'VERBOSE:' + msg, parameters)
   }
 
-  log(logLevel: LogLevel, msg: string, ...parameters: any[]): void {
+  private log(logLevel: LogLevel, msg: string, parameters: any[]): void {
     if (logLevel <= this.logLevel) {
-      Logger.log(msg, parameters);
+      Logger.log.apply(Logger, [msg, ...parameters]);
     }
   }
 

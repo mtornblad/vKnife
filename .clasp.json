@@ -1,1 +1,5 @@
-{"scriptId":"1UnDre7ODSMc01sMMAhSSSC1zz7JLAvtvhBgfGc36BB2h-hLlIV_ndUwg"}
+{
+    "scriptId":"1UnDre7ODSMc01sMMAhSSSC1zz7JLAvtvhBgfGc36BB2h-hLlIV_ndUwg",
+    "rootDir": "build/",
+    "filePushOrder": ["Main.ts", "file2.ts"]
+}
