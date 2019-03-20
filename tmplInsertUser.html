@@ -1,0 +1,17 @@
+{
+  "primaryEmail": "<?= user.first_name.emailFriendly() ?>.<?= user.last_name.emailFriendly() ?>@rottne.scout.se",
+  "name": {
+    "givenName": "<?= user.first_name ?>",
+    "familyName": "<?= user.last_name ?>",
+  },
+  "password": "<?= randomizePassword() ?>",
+  "changePasswordAtNextLogin": true,
+  "externalIds": [
+    {
+      "value": "<?= user.member_no ?>",
+      "type": "organization",
+    }
+  ],
+  "customerId": "<?= conf.customerId ?>",
+  "orgUnitPath": "/<?= conf.orgUnitPathBase.trim().trimChar('/') ?>/<?= user.orgUnitPath.trim().trimChar('/') ?>",
+}
