@@ -6,7 +6,8 @@
         {
             "label": "Push to GASP",
             "type": "shell",
-            "command": "clasp push"
+            "command": "clasp push",
+            "problemMatcher": []
         }
-    ]
+     ]
 }
