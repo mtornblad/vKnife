@@ -1,9 +1,10 @@
-import { LogLevel } from "./Log";
-
 export class Config {
-    props: GoogleAppsScript.Properties.Properties = PropertiesService.getUserProperties();
-    defaults: any = {
-        'loglevel': LogLevel.Error
+    private props: any = PropertiesService.getUserProperties();
+    private defaults: any = {
+        scoutnetId: '',
+        memberListKey: '',
+        groupListKey: '',
+
     };
 
     constructor() {
@@ -14,13 +15,8 @@ export class Config {
         }
     }
 
-    get(key: string):string {
+    get(key: string): string {
         return this.props.getProperty(key);
     }
 }
 
-function teet() {
-    var c = new Config();
-    Logger.log(c.get('loglevel'));
-  }
-  
