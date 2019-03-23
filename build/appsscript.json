@@ -1,6 +1,8 @@
 {
   "timeZone": "Europe/Paris",
-  "dependencies": {
-  },
-  "exceptionLogging": "STACKDRIVER"
+  "dependencies": {},
+  "exceptionLogging": "STACKDRIVER",
+  "executionApi": {
+    "access": "ANYONE"
+  }
 }
