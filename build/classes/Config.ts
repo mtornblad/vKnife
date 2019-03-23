@@ -1,10 +1,12 @@
 export class Config {
     private props: any = PropertiesService.getUserProperties();
     private defaults: any = {
-        scoutnetId: '',
-        memberListKey: '',
-        groupListKey: '',
-
+        'scoutnetId': '',
+        'memberListKey': '',
+        'groupListKey': '',
+        'gsuite.domain': 'rottne.scout.se',
+        'gsuite.customerId': 'my_customer',
+        'gsuite.cacheMode': true,
     };
 
     constructor() {
@@ -15,7 +17,7 @@ export class Config {
         }
     }
 
-    get(key: string): string {
+    get(key: string): any {
         return this.props.getProperty(key);
     }
 }

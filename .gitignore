@@ -1,6 +1,13 @@
 
 # User-specific files
+cred.json
 
+# FIles related to Node and libraries
 /node_modules
-/crap
 package-lock.json
+
+#Temporary
+/crap
+
+
+
