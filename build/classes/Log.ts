@@ -4,7 +4,8 @@ export enum LogLevel {
   Warn,
   Info,
   Debug,
-  Debug2
+  Debug2,
+  Debug3
 }
 
 export class Log {
@@ -24,31 +25,48 @@ export class Log {
   }
 
   error(msg: string, ...parameters: any[]): void {
-    this.log(LogLevel.Error, '[' + this.error.caller + '] ERROR: ' + msg, parameters)
+    if (this.logLevel >= LogLevel.Error) {
+      console.error.apply(console, ['[' + this.caller + '] ' + msg, ...parameters]);
+      Logger.log.apply(Logger, ['[' + this.caller + '] ERROR: ' + msg, ...parameters]);
+    }
   }
 
   warn(msg: string, ...parameters: any[]): void {
-    this.log(LogLevel.Warn, '[' + this.caller + '] WARN: ' + msg, parameters)
+    if (this.logLevel >= LogLevel.Warn) {
+      console.warn.apply(console, ['[' + this.caller + '] ' + msg, ...parameters]);
+      Logger.log.apply(Logger, ['[' + this.caller + '] WARN: ' + msg, ...parameters]);
+    }
   }
 
   info(msg: string, ...parameters: any[]): void {
-    this.log(LogLevel.Info, '[' + this.caller + '] INFO: ' + msg, parameters)
+    if (this.logLevel >= LogLevel.Info) {
+      console.info.apply(console, ['[' + this.caller + '] ' + msg, ...parameters]);
+      Logger.log.apply(Logger, ['[' + this.caller + '] INFO: ' + msg, ...parameters]);
+    }
   }
 
   debug(msg: string, ...parameters: any[]): void {
-    this.log(LogLevel.Debug, '[' + this.caller + '] DEBUG: ' + msg, parameters)
+    if (this.logLevel >= LogLevel.Debug) {
+      console.log.apply(console, ['[' + this.caller + '] ' + msg, ...parameters]);
+      Logger.log.apply(Logger, ['[' + this.caller + '] DEBUG: ' + msg, ...parameters]);
+    }
   }
 
   debug2(msg: string, ...parameters: any[]): void {
-    this.log(LogLevel.Debug2, '[' + this.caller + '] DEBUG2: ' + msg, parameters)
-  }
-
-  private log(logLevel: LogLevel, msg: string, parameters: any[]): void {
-    if (logLevel <= this.logLevel) {
-      Logger.log.apply(Logger, [msg, ...parameters]);
-      //console.log.apply(console, [msg, ...parameters]);
+    if (this.logLevel >= LogLevel.Debug) {
+      console.log.apply(console, ['[' + this.caller + '] ' + msg, ...parameters]);
+      Logger.log.apply(Logger, ['[' + this.caller + '] DEBUG: ' + msg, ...parameters]);
     }
   }
+
+  debug3(msg: string, ...parameters: any[]): void {
+    if (this.logLevel >= LogLevel.Debug3) {
+      console.log.apply(console, ['[' + this.caller + '] ' + msg, ...parameters]);
+      Logger.log.apply(Logger, ['[' + this.caller + '] DEBUG: ' + msg, ...parameters]);
+    }
+  }
+
+
 
 }
 

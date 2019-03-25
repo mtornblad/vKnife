@@ -1,36 +1,19 @@
 import { Log, LogLevel } from "./Log";
+import { Config } from "./Config";
 import { Helpers } from "../code/Helpers";
-
-
 
 export class Scoutnet {
 
-    private log: Log = new Log('Scoutnet')
-    private scoutnetId: string;
-    private memberListKey: string;
-    private groupListKey: string;
+    private log: Log = new Log('Scoutnet');
+    private config: Config = new Config();
     private members: any = null;
     private lists: any = null;
     private filterCache: any = {};
-
-    private filters: any =
-        {
-            'anyrole':
-                [
-                    { type: 'in_group_role', match: 'Styrelseledamot' },
-                    { type: 'in_unit_role', match: '*' },
-                ],
-            'inlist_4515':
-                [
-                    { type: 'in_custom_list', match: '4515' }
-                ]
-        };
+    
 
 
-    constructor(scoutnetId: string, memberListKey: string, groupListKey: string) {
-        this.scoutnetId = scoutnetId;
-        this.memberListKey = memberListKey;
-        this.groupListKey = groupListKey;
+
+    constructor() {
         this.log.debug('Constructed!');
     }
 
@@ -43,7 +26,7 @@ export class Scoutnet {
             this.members = {};
 
             //TODO: errorhandling
-            var response = UrlFetchApp.fetch('https://www.scoutnet.se/api/group/memberlist?id=' + this.scoutnetId + '&key=' + this.memberListKey);
+            var response = UrlFetchApp.fetch('https://www.scoutnet.se/api/group/memberlist?id=' + this.config.get('scoutnet.id') + '&key=' + this.config.get('scoutnet.memberListKey'));
             var membersRaw: JSON = JSON.parse(response.getContentText()).data;
             this.log.debug('Memberlist loaded from scoutnet! \n%s', JSON.stringify(membersRaw));
             for (var memberId in membersRaw) {
@@ -53,17 +36,17 @@ export class Scoutnet {
                     switch (property) {
                         case 'contact_mobile_phone':
                             //TODO! Formatters
-                            member[property] = memberRaw[property].value;
+                            member[property] = memberRaw[property].value.phoneNumber();
                             break;
 
                         case 'email':
                             //TODO! Formatters
-                            member[property] = memberRaw[property].value;
+                            member[property] = memberRaw[property].value.trim().toLowerCase();
                             break;
 
                         case 'unit_role':
                         case 'group_role':
-                            member[property] = Helpers.splitAndTrim(memberRaw[property].value, ',');
+                            member[property] = memberRaw[property].value.splitAndTrim(',');
                             break;
 
                         default:
@@ -83,12 +66,12 @@ export class Scoutnet {
     getLists(): any {
         if (this.lists === null) {
 
-            var response = UrlFetchApp.fetch('https://www.scoutnet.se/api/group/customlists?id=' + this.scoutnetId + '&key=' + this.groupListKey);
+            var response = UrlFetchApp.fetch('https://www.scoutnet.se/api/group/customlists?id=' + this.config.get('scoutnet.id') + '&key=' + this.config.get('scoutnet.groupListKey'));
             this.lists = JSON.parse(response.getContentText());
             var listId: string;
             // Add an extra property 'members' as an array with all id of users 
             for (listId in this.lists) {
-                var list = UrlFetchApp.fetch('https://www.scoutnet.se/api/group/customlists?id=' + this.scoutnetId + '&key=' + this.groupListKey + '&list_id=' + listId);
+                var list = UrlFetchApp.fetch('https://www.scoutnet.se/api/group/customlists?id=' + this.config.get('scoutnet.id') + '&key=' + this.config.get('scoutnet.groupListKey') + '&list_id=' + listId);
                 this.lists[listId].members = Object.keys(JSON.parse(list.getContentText()).data);
             }
             this.log.debug2('this.lists\n%s', this.lists);
@@ -103,16 +86,20 @@ export class Scoutnet {
     // Function to get memberid:s from members matching named filter
     //
     getFilteredMembersId(filterName: string): any {
-        var filters: any = this.filters[filterName];
+        var filters: any = this.config.get('scoutnet.filters')[filterName];
 
+        if (filters === undefined) {
+            this.log.error('Invalid filter name specified, returning empty array!')
+            return [];
+        }
         this.log.debug('Getting filtered list, name: %s, rules %s.', filterName, filters)
 
         if (this.filterCache[filterName] === undefined) {
             this.filterCache[filterName] = [];
 
-            var members: any = this.getMembers();
             var memberIds: string[] = this.filterCache[filterName];
             var memberId: string;
+            var members: any = this.getMembers();
 
             for (memberId in members) {
                 for (var i = 0; i < filters.length; i++) {
@@ -128,6 +115,9 @@ export class Scoutnet {
                             break;
                         case 'in_custom_list':
                             match = (this.matchCustomList(memberId, filter.match));
+                            break;
+                        case 'memberid':
+                            match = (memberId === filter.match);
                             break;
                         default:
                             this.log.warn('Invalid filter type %s.', filter.type);
@@ -186,6 +176,76 @@ export class Scoutnet {
         }
 
         return (lists[listToMatch].members.indexOf(memberId) > -1);
+    }
+
+
+    //
+    // Get scoutnet member as a GSuite user object
+    //
+    getGUser(memberId: string): any {
+        var member: any = this.getMembers()[memberId];
+        if (member === undefined)
+            return undefined;
+
+        var gsuiteUser =
+        {
+            "name": {
+                "givenName": member.first_name,
+                "familyName": member.last_name,
+            },
+            "externalIds": [
+                {
+                    "value": member.member_no,
+                    "type": "organization",
+                }
+            ],
+            "customerId": this.config.get('gsuite.customerId'),
+            "orgUnitPath": "",
+            "includeInGlobalAddressList": true,
+        }
+
+        if (typeof member.email != 'undefined') {
+            gsuiteUser['emails'] =
+                [
+                    {
+                        "type": "home",
+                        "address": member.email,
+                        "primary": false
+                    }
+                ];
+            gsuiteUser["recoveryEmail"] = member.email;
+        }
+
+        if (typeof member.address_1 != 'undefined' && typeof member.postcode != 'undefined' && typeof member.town != 'undefined') {
+            gsuiteUser["addresses"] = [
+                {
+                    "type": "home",
+                    "formatted": `${member.address_1}, ${member.postcode} ${member.town.toUpperCase()}`,
+                }
+            ];
+        }
+
+        if (typeof member.contact_mobile_phone != 'undefined') {
+            gsuiteUser["phones"] = [
+                {
+                    "value": member.contact_mobile_phone,
+                    "primary": true,
+                    "type": "mobile",
+                }
+            ];
+            gsuiteUser["recoveryPhone"] = member.contact_mobile_phone;
+        };
+
+        gsuiteUser["customSchemas"] = {
+            "scoutnetSync": {
+                "lastUpdate": Date.now(),
+                "updateHash": MD5(JSON.stringify(gsuiteUser))
+            }
+        };
+
+
+        return gsuiteUser;
+
     }
 
 

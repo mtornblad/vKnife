@@ -1,6 +1,7 @@
 
 # User-specific files
 creds.json
+.clasprc.json
 
 # FIles related to Node and libraries
 /node_modules
