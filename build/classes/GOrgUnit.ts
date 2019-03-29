@@ -11,7 +11,7 @@ export class GOrgUnit {
     private customerId: string = this.config.get('gsuite.customerId');
     private orgUnitPath: string;
 
-    constructor(orgUnitPath: string) {
+    constructor(orgUnitPath: any) {   //todo change to string
         //Trim whitespace and leading and trailing slash
         this.orgUnitPath = orgUnitPath.trim().trimChar('/');
         this.log.debug(`OrgUnitPath object created with path "${this.orgUnitPath}"`);

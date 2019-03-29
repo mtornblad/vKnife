@@ -1,6 +1,5 @@
 import { Log, LogLevel } from "./Log";
 import { Config } from "./Config";
-import { Helpers } from "../code/Helpers";
 
 export class Scoutnet {
 
@@ -60,6 +59,7 @@ export class Scoutnet {
         return this.members;
     }
 
+
     //
     // Function to return all lists with members and load info from Scoutnet if not already done!
     //
@@ -85,7 +85,7 @@ export class Scoutnet {
     //
     // Function to get memberid:s from members matching named filter
     //
-    getFilteredMembersId(filterName: string): any {
+    private getFilteredMemberList(filterName: string): any {
         var filters: any = this.config.get('scoutnet.filters')[filterName];
 
         if (filters === undefined) {
@@ -136,6 +136,7 @@ export class Scoutnet {
         return memberIds;
     }
 
+
     //
     // Internal function to check if member is in role
     //
@@ -179,13 +180,19 @@ export class Scoutnet {
     }
 
 
+    getGUsers() :any[] {
+        
+        return []
+    }
+
+
     //
     // Get scoutnet member as a GSuite user object
     //
-    getGUser(memberId: string): any {
+    private getGUser(memberId: string): any {
         var member: any = this.getMembers()[memberId];
         if (member === undefined)
-            return undefined;
+            return undefined;   
 
         var gsuiteUser =
         {
@@ -248,8 +255,6 @@ export class Scoutnet {
 
     }
 
-
-    test() { this.log.debug('this = %s', this.constructor.name) }
 
 
 }

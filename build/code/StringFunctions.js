@@ -1,3 +1,4 @@
+
 String.prototype.startsWith = function (it) {
   return this.indexOf(it) == 0;
 };

@@ -15,9 +15,10 @@ function test() {
 
     var config = new Config();
 
-    
+
     var x = new Scoutnet();
-    var y = new GOrgUnit('/Scoutnet/Nisse');
+    /*
+        var y = new GOrgUnit('/Scoutnet/Nisse');
     // var y = new GOrgUnit('/Scoutnet/Olle/');
 
     log.info('exists? = %s', y.exists())
@@ -28,6 +29,11 @@ function test() {
     log.info('anyrole %s', x.getFilteredMembersId('anyrole'));
 
     log.info('userobject \n%s', JSON.stringify(x.getGUser('3328268')));
+*/
+    config.resetToDefault('gsuite.userRules');
+    log.info(x.getMembers())
+    log.info(x.getMembers()[3328268])
+    log.info(config.get('gsuite.userRules',x.getMembers()[3328268]));
 
 
 }
