@@ -2,7 +2,7 @@
 <catalog>
    <book id="bk101">
       <author>Gambardella, Matthew</author>
-      <title>XML Developer's Guide</title>
+      <title>XML Developer's Guide 2</title>
       <genre>Computer</genre>
       <price>44.95</price>
       <publish_date>2000-10-01</publish_date>
